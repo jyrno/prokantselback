@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, make_response
 from flask_restful import Resource, Api
+from flask import request
+import synonymes as syn
 
 import backend
 
@@ -15,6 +17,12 @@ def hello_world():
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
+
+@app.route("/synonymes/", methods=['GET'])
+def synonymes():
+    word = request.args.get('word', default = '*', type = str)
+    synonymes = syn.list_of_synonymes(word)
+    return jsonify(word = word, synonymes = synonymes)
 
 class Kantseliit(Resource):
     def get(self):
