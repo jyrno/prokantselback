@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, make_response
-from flask_restful import reqparse, Resource, Api
 from flask import request
+from flask_restful import reqparse, Resource, Api
+
 import synonymes as syn
 import keerukus
 
@@ -58,6 +59,7 @@ class Analuus(Resource):
     def post(self):
         args = parser.parse_args()
         text = args['text']
+        print(text)
         return jsonify({
             'complexity': keerukus.text_complexity_evaluation(text),
             'analysis': analyys(text)
@@ -74,4 +76,4 @@ api.add_resource(Pooltarind, '/tarind/<tekst>')
 api.add_resource(Analuus, '/check')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(ssl_context='adhoc')
