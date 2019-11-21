@@ -229,6 +229,8 @@ nomin = teenom()
 def nominalisatsioon(tekstsisse):
     #see nominalisatsiooni meetod otsib sõnaaknaid ühendverbidele jaoks nt "aset leidma"
     #argument on kogu tekstikasti tekst
+
+    tagastatavsona = ""
     sonastik = nomin[0]
     kahesedsonad = nomin[1]
     
@@ -284,13 +286,14 @@ def nominalisatsioon(tekstsisse):
                                 lausesonad[m] ='#'
                                 lauselemmad[lahedus] = '#'
                                 seletused.append(sonastik[sonapaar[0]+" "+sonapaar[1]])
+                                tagastatavsona += " " + sonapaar[0]+" "+sonapaar[1]
                                 kantseliit.append(lause[:-1])
                     except:
                         continue
      
                     
     #leitud lauseosa tagastatakse ning seletused tagastakse       
-    return ([kantseliit,seletused])
+    return ([kantseliit,seletused,tagastatavsona])
 #Splitter ---------------------------------------------------------------------------------------------------------------------------------------------
 #tekstifailist saadud informatsioon loetakse sisse
 def teemitmus():
@@ -469,7 +472,7 @@ kants = teekants()
     
 def kantsonanalyys(tekstsisse):
     #argumendina tuleb sisse terve tekstikasti tekst
-    
+    leitudsona = ""
     kahesedsonad = kants[0]
     sonastik = kants[1]
     liitsonad = kants[2]
@@ -502,6 +505,7 @@ def kantsonanalyys(tekstsisse):
             #lisatakse kohe sõna tagastamise listi
             kantseliit.append(i)
             seletused.append(sonastik[i])
+            leitudsona += " " + i
         else:
             try:
                 lemma=text.lemmas[0]
@@ -512,13 +516,16 @@ def kantsonanalyys(tekstsisse):
                 
                 kantseliit.append(i)
                 seletused.append(sonastik[lemma])
+
                
-    return ([kantseliit,seletused])
+    return ([kantseliit,seletused, leitudsona])
     
 def syntaksileidmine(lause):
     #syntaks analüüsiga lause tuleb sisse
     #kahesedsonad on kantseliidisõnade tekstifailidst leitud ühendverbid
     #sonastik on kantseliidisõnade tekstifaili põhjal tehtud sõnastik, kus võti on sõna ja väärtus on seletus
+
+    tagastatavsona = ""
     kahesedsonad = kants[0]
     sonastik = kants[1]
     
@@ -560,9 +567,10 @@ def syntaksileidmine(lause):
                 
                 seletused.append(sonastik[sonapaar[0]+" "+sonapaar[1]])
                 kantseliit.append(tagastamislause[:-1])
+                tagastatavsona += " " + sonapaar[0]+" "+sonapaar[1]
     
     #Tagastame kõik leitud kantseliitlikud lauseosad ja nende seletused      
-    return ([kantseliit,seletused])
+    return ([kantseliit,seletused, tagastatavsona])
 #Splitter --------------------------------------------------------------------------------------------------------------------------------------------- 
 #Loetakse sisse paronüümide txt failidst
 def teeanalyys():
@@ -637,6 +645,7 @@ def kasnomolemas(lause):
     #sisse tuleb lause millele on süntaktiline analüüs tehtud
     seletused = []
     kantseliit = []
+    leitudsona = ""
     sonastik = nomin[0]
     
     #kaotan lausest tühjand elemendid
@@ -675,11 +684,12 @@ def kasnomolemas(lause):
                 kohaliklause= ""
                 for alguslopp in range(paar[0],paar[1]+1):
                     kohaliklause+=lause[alguslopp][0]+" "
+                leitudsona += " " + verb
                 seletused.append(sonastik[verb])
                 kantseliit.append(kohaliklause[:-1])
                 tagastamine = []
       
-    return ([kantseliit,seletused])
+    return ([kantseliit,seletused,leitudsona])
 
 
                         

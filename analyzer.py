@@ -6,7 +6,7 @@ from multiprocessing.pool import ThreadPool
 from errortypes import Type
 from collections import namedtuple
 
-Error = namedtuple("Error", ("text", "type"))
+Error = namedtuple("Error", ("text", "type", "verb", "synonyms"))
 
 
 def sisend(tekstsisse):
@@ -59,7 +59,7 @@ def sisend(tekstsisse):
         for m in range(len(kesksona[0])):
             # tehakse märgend, olema + kesksona märgend on punane
             # textbox.tag_config(kesksona[0][m], background="red")
-            errorList.append(Error(str(kesksona[0][0]), Type.OLEMA_KESKSONA)._asdict())
+            errorList.append(Error(" ".join(kesksona[0]), Type.OLEMA_KESKSONA, "", "")._asdict())
 
             # Täpselt samamoodi nagu eelmisega, aga siin on tegemist kantseliitlike sõnade (ühendverbide) leidmisega
             # Et teada, kas tegemist on kantseliidiga nt "läbi viima" ja, et teada, kas "läbi" ülem on "viima" peame kontrollima süntaksit
@@ -71,7 +71,8 @@ def sisend(tekstsisse):
             for m in range(len(kantseliidivastus1[0])):
                 # Defineerime märgendi iga lauseosa jaoks
                 # textbox.tag_config(kantseliidivastus1[0][m],background='lightgreen')
-                errorList.append(Error(kantseliidivastus1[0][0], Type.KANTSELIIT)._asdict())
+                print("kantseliidivastus1 : "+str(kantseliidivastus1))
+                errorList.append(Error(" ".join(kantseliidivastus1[0]), Type.KANTSELIIT, kantseliidivastus1[2].strip(), "")._asdict())
 
         # Tegemist määrus saavas käändes kantseliidiga
         # samamoodi nagu eelmistel tehakse lõim
@@ -81,7 +82,7 @@ def sisend(tekstsisse):
         for m in range(len(maarussaavas[0])):
             # defineeritakse märgend selle kantseliidivormi jaoks
             # textbox.tag_config(maarussaavas[0][m],background="grey78")
-            errorList.append(Error(maarussaavas[0][0], Type.SAAV_KAANE)._asdict())
+            errorList.append(Error(" ".join(maarussaavas[0]), Type.SAAV_KAANE, "", "")._asdict())
 
         # Tegemist on nominalisatsiooniga. Siin ei otsita ühendverbe vaid tühiverbi + -mine vormi või sihitisega koos tühiverbe
         # samamoodi lõimedega nagu eelmised
@@ -91,8 +92,8 @@ def sisend(tekstsisse):
         for m in range(len(nom[0])):
             # tehakse märgend iga lauseosa jaoks
             # textbox.tag_config(nom[0][m],background = "bisque3")
-            print(nom[0][0])
-            errorList.append(Error(nom[0][0], Type.NOMINALISATSIOON)._asdict())
+            print("nom : "+str(nom))
+            errorList.append(Error(" ".join(nom[0]), Type.NOMINALISATSIOON, nom[2].strip(), "")._asdict())
 
 
     # Kutsutakse backend failist välja meetod kokku. Seal meetodis arvutatakse kogu sõnade arv kogu tekstis
@@ -105,7 +106,7 @@ def sisend(tekstsisse):
     for m in range(len(poolttar[0])):
         # iga lauseosa korral tehakse märgend ning kutsutakse välja search funktsioon, mis lisab märgendi tekstikasti
         # textbox.tag_config(poolttar[0][m],background="maroon1")
-        errorList.append(Error(poolttar[0][0], Type.POOLT_TARIND)._asdict())
+        errorList.append(Error(" ".join(poolttar[0]), Type.POOLT_TARIND, "", "")._asdict())
 
     # Kutsutakse välja meetod ltmaar, argumendiks on sisendtekst
     ltmaarsonad = backend.ltmaar(tekstsisse)
@@ -113,7 +114,7 @@ def sisend(tekstsisse):
     for m in range(len(ltmaarsonad[0])):
         # iga lauseosa korral tehakse märgend ning kutsutakse välja search funktsioon, mis lisab märgendi tekstikasti
         # textbox.tag_config(ltmaarsonad[0][m],background='yellow')
-        errorList.append(Error(ltmaarsonad[0][0], Type.LT_MAARSONA)._asdict())
+        errorList.append(Error(" ".join(ltmaarsonad[0]), Type.LT_MAARSONA, "", "")._asdict())
 
     # Kui eelnevalt kutsusime paar funktsiooni eraldi lõimede peal välja (*)
     # siis siin hakkame nende tagastatud järjenditega tegelema
@@ -125,7 +126,8 @@ def sisend(tekstsisse):
     for m in range(len(nom[0])):
         # defineerime märgendi
         # textbox.tag_config(nom[0][m],background = "bisque3")
-        errorList.append(Error(nom[0][0], Type.NOMINALISATSIOON)._asdict())
+        print("nom : " + str(nom))
+        errorList.append(Error(" ".join(nom[0]), Type.NOMINALISATSIOON, nom[2].strip(), "")._asdict())
 
     # Saame lõimel kutsutud funktsiooni väärtuse
     vastus = parthread.get()
@@ -133,7 +135,8 @@ def sisend(tekstsisse):
     for m in range(len(vastus[0])):
         # seame iga sõna vastavusse värviga - defineerime märgendi
         # textbox.tag_config(vastus[0][m],background='lightblue')
-        errorList.append(Error(vastus[0][0], Type.PARONUUM)._asdict())
+        print("paronuum : " + str(vastus))
+        errorList.append(Error(" ".join(vastus[0]), Type.PARONUUM, "", "")._asdict())
 
     # Leitud kantseliit - mitmus ainsuse asemel
 
@@ -144,7 +147,7 @@ def sisend(tekstsisse):
         # Esimesel kohal on leitud kantseliitlikud sõnad
         # Iga sõna jaoks defineeritakse märgend ja värv
         # textbox.tag_config(mitmusains[0][m],background='pink3')
-        errorList.append(Error(mitmusains[0][0], Type.LIIGNE_MITMUS)._asdict())
+        errorList.append(Error(" ".join(mitmusains[0]), Type.LIIGNE_MITMUS, "", "")._asdict())
 
     # Leitud kantseliitlikud sõnad
     # Lõim pandi alguses käima (*)
@@ -154,6 +157,7 @@ def sisend(tekstsisse):
     for m in range(len(kantseliidivastus[0])):
         # igale sõnale defineeritakse märgend
         # textbox.tag_config(kantseliidivastus[0][m],background='lightgreen')
-        errorList.append(Error(kantseliidivastus[0][0], Type.KANTSELIIT)._asdict())
+        print("kantseliidivastus : " + str(kantseliidivastus))
+        errorList.append(Error(" ".join(kantseliidivastus[0]), Type.KANTSELIIT, kantseliidivastus[2].strip(), "")._asdict())
 
     return errorList
