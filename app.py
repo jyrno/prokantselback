@@ -1,10 +1,11 @@
 from flask import Flask, jsonify, make_response
-from flask_restful import Resource, Api
+from flask_restful import reqparse, Resource, Api
 from flask import request
 import synonymes as syn
 import keerukus
 
 import backend
+import analyzer
 
 app = Flask(__name__)
 api = Api(app)
@@ -19,11 +20,13 @@ def hello_world():
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
+
 @app.route("/synonymes/", methods=['GET'])
 def synonymes():
     word = request.args.get('word', default = '*', type = str)
     synonymes = syn.list_of_synonymes(word)
     return jsonify(word = word, synonymes = synonymes)
+
 
 @app.route("/teksti-keerukus/", methods=['GET'])
 def teksti_keerukus():
@@ -31,28 +34,44 @@ def teksti_keerukus():
     response = keerukus.text_complexity_evaluation(text)
     return jsonify(complexity = response[1], percentage = response[0])
 
+
 class Kantseliit(Resource):
     def get(self):
         return "Kantseliit on selline keeruline asi, millest keegi aru ei saa"
+
 
 class Loe(Resource):
     def get(self, tekst):
         return backend.kokku(tekst)
 
+
 class Pooltarind(Resource):
     def get(self, tekst):
         return backend.poolttarind(tekst)
 
-class Analuus(Resource):
-    def post(self, tekst):
-        return jsonify({'analuus': (tekst)})
 
+parser = reqparse.RequestParser()
+parser.add_argument('text')
+
+
+class Analuus(Resource):
+    def post(self):
+        args = parser.parse_args()
+        text = args['text']
+        return jsonify({
+            'complexity': keerukus.text_complexity_evaluation(text),
+            'analysis': analyys(text)
+        })
+
+
+def analyys(tekst):
+    return analyzer.sisend(tekst)
 
 
 api.add_resource(Kantseliit, '/kantsel')
 api.add_resource(Loe, '/loe/<tekst>')
 api.add_resource(Pooltarind, '/tarind/<tekst>')
-api.add_resource(Analuus, '/analuus')
+api.add_resource(Analuus, '/check')
 
 if __name__ == '__main__':
     app.run()

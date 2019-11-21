@@ -1,17 +1,20 @@
 import estnltk
+from collections import namedtuple
+
+Complex = namedtuple("Complex", ("coef", "text"))
 
 def text_complexity_evaluation(text) -> float:
     coef = avg_char_count_in_sentence(text)
     response = []
     if coef < 3.0:
-        response = [25, "Väga lihtne tekst."]
+        response = Complex(25, "Väga lihtne tekst.")
     if coef >= 3.0 and coef < 5.0:
-        response = [50, "Lihtne tekst."]
+        response = Complex(50, "Lihtne tekst.")
     if coef >= 5.0 and coef < 8.0:
-        response = [75, "Raskesti mõistetav tekst."]
+        response = Complex(75, "Raskesti mõistetav tekst.")
     if coef >= 8.0:
-        response = [100, "Äärmiselt raskesti mõistetav tekst."]
-    return response
+        response = Complex(100, "Äärmiselt raskesti mõistetav tekst.")
+    return response._asdict()
 
 def avg_char_count_in_sentence(text) -> float:
     words = (estnltk.Text(text)).tokenize_words().words
