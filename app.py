@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask, request, jsonify, make_response
+from flask_cors import CORS
 from flask_restful import reqparse, Resource, Api
 from flask import request
 import synonymes as syn
@@ -8,6 +9,7 @@ import backend
 import analyzer
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
 
@@ -74,4 +76,4 @@ api.add_resource(Pooltarind, '/tarind/<tekst>')
 api.add_resource(Analuus, '/check')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', ssl_context='adhoc')
