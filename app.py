@@ -2,6 +2,7 @@ from flask import Flask, jsonify, make_response
 from flask_restful import Resource, Api
 from flask import request
 import synonymes as syn
+import keerukus
 
 import backend
 
@@ -23,6 +24,12 @@ def synonymes():
     word = request.args.get('word', default = '*', type = str)
     synonymes = syn.list_of_synonymes(word)
     return jsonify(word = word, synonymes = synonymes)
+
+@app.route("/teksti-keerukus/", methods=['GET'])
+def teksti_keerukus():
+    text = request.args.get('text', default = '*', type = str)
+    response = keerukus.text_complexity_evaluation(text)
+    return jsonify(complexity = response[1], percentage = response[0])
 
 class Kantseliit(Resource):
     def get(self):
