@@ -21,6 +21,6 @@ regex==2019.11.1
 six==1.13.0
 soupsieve==1.9.5
 unicodecsv==0.14.1
-urllib3==1.25.7
+urllib3==1.26.5
 webencodings==0.5.1
 Werkzeug==0.16.0
